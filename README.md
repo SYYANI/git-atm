@@ -1,6 +1,6 @@
 # 🤖 Git-ATM (AI Commit Message Generator)
 
-Git-ATM 是一个智能的 Git commit 信息生成工具，它使用 OpenAI API 来分析你的代码变更，并自动生成清晰、规范的 commit 信息。
+Git-ATM 是一个智能的 Git commit 信息生成工具，它使用 OpenAI API(或对齐的api，如DeepSeek API) 来分析你的代码变更，并自动生成清晰、规范的 commit 信息。
 
 ## ✨ 特性
 

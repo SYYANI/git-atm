@@ -15,7 +15,7 @@ Git-ATM 是一个智能的 Git commit 信息生成工具，它使用 OpenAI API(
 
 1. 克隆仓库：
 ```bash
-git clone git@github.com:falconchen/git-atm.git
+git clone https://github.com/falconchen/git-atm.git
 ```
 
 2. 添加执行权限：

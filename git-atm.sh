@@ -8,28 +8,32 @@ BASE_URL=${ATM_OPENAI_API_BASE_URL:-"https://api.openai.com/v1/completions"}
 MODEL=${ATM_OPENAI_API_MODEL:-"gpt-4"}
 TOKEN=${ATM_OPENAI_API_TOKEN:-"your-api-token-here"}
 
-# Prompt to use
+# Updated prompt to generate [type]: [description] format
 PROMPT="Take a deep breath and work on this problem step-by-step. Summarize the provided diff into a clear and concise written commit message. Follow these rules:
 
-1. Start the message with an appropriate emoji that represents the type of change.
-2. Use the imperative style for the subject.
-3. Limit the subject line to 50 characters or less (excluding the emoji).
-4. Optionally, use a scope in parentheses after the emoji.
-5. If needed, add a brief description in the body, separated by a blank line.
-6. Be as descriptive as possible while keeping it concise.
-7. Return the commit message ready to be pasted into commit edits without further editing.
-8. Always reply in English.
+1. Use the format '[type]: description' where type is one of:
+   - feat (new feature)
+   - fix (bug fix)
+   - docs (documentation)
+   - style (formatting, missing semicolons, etc)
+   - refactor (refactoring code)
+   - perf (performance improvements)
+   - test (adding tests)
+   - chore (maintenance tasks)
 
-Here are some common emojis for reference:
-✨ New feature
-🐛 Bug fix
-📚 Documentation
-🎨 Style/UI
-♻️ Refactor
-🚀 Performance
-🧪 Test
-🔧 Configuration
-🔒 Security
+2. Use the imperative style for the description
+3. Limit the subject line to 50 characters
+4. If needed, add a blank line followed by bullet points for additional details
+5. Be as descriptive as possible while keeping it concise
+6. Return the commit message ready to be pasted into commit edits without further editing
+7. Always reply in English
+
+Example format:
+[feat]: add user authentication system
+
+- Implement JWT token generation
+- Add login/logout endpoints
+- Create user authentication middleware
 
 Provide only the commit message, without any additional explanations or formatting."
 
@@ -55,8 +59,6 @@ if [ -z "$DIFF" ]; then
   fi
 fi
 
-
-
 # 准备请求数据
 REQUEST_DATA=$(jq -n \
                   --arg model "$MODEL" \
@@ -73,8 +75,6 @@ REQUEST_DATA=$(jq -n \
                     max_tokens: $max_tokens|tonumber,
                     temperature: $temperature|tonumber
                   }')
-
-
 
 # 发送请求到API并处理可能的错误
 send_api_request() {
@@ -110,15 +110,18 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# 提取生成的提交信息
+# 提取生成的提交信息并确保格式正确
 COMMIT_MSG=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' | sed 's/^```//; s/```$//')
+
+# 验证提交信息格式
+if ! echo "$COMMIT_MSG" | grep -qE '^\[?(feat|fix|docs|style|refactor|perf|test|chore|ci)(\([^)]+\))?\]?: .+$'; then
+  echo "警告：生成的提交信息可能不符合预期格式"
+fi
 
 if [ -z "$COMMIT_MSG" ]; then
   echo "错误：无法从API响应中提取提交信息"
   exit 1
 fi
-
-
 
 # 显示生成的提交信息
 echo -e "\n生成的提交信息：\n$COMMIT_MSG\n"

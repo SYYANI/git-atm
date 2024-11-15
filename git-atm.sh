@@ -37,6 +37,33 @@ Example format:
 
 Provide only the commit message, without any additional explanations or formatting."
 
+# PROMPT="请深呼吸,并按步骤处理这个问题。将提供的diff总结为清晰简洁的commit message。请遵循以下规则:
+
+# 1. 使用'[类型]: 描述'的格式,其中类型为以下之一:
+#  - feat (新功能)
+#  - fix (修复bug)
+#  - docs (文档)
+#  - style (格式化、补充分号等)
+#  - refactor (重构代码)
+#  - perf (性能优化)
+#  - test (添加测试)
+#  - chore (维护任务)
+
+# 2. 描述部分使用祈使句式
+# 3. 主题行限制在50个字符内
+# 4. 如有需要,空一行后用要点符号列出额外细节
+# 5. 在保持简洁的同时尽可能描述详细
+# 6. 返回可直接粘贴到commit编辑中的commit message,无需进一步编辑
+# 7. 始终使用中文回复
+
+# 示例格式:
+# [feat]: 添加用户认证系统
+# - 实现JWT令牌生成
+# - 添加登录/登出接口
+# - 创建用户认证中间件
+
+# 只需提供commit message,无需任何额外解释或格式化。"
+
 # 获取git diff
 DIFF=$(git diff --cached)
 USE_STAGED=true

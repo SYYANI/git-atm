@@ -4,9 +4,9 @@ if [ -f ~/.atmrc ]; then
     source ~/.atmrc
 fi
 # Default configuration
-BASE_URL=${ATM_OPENAI_API_BASE_URL:-"https://api.openai.com/v1/completions"}
-MODEL=${ATM_OPENAI_API_MODEL:-"gpt-4"}
-TOKEN=${ATM_OPENAI_API_TOKEN:-"your-api-token-here"}
+BASE_URL=${ATM_OPENAI_API_BASE_URL:-"https://api.deepseek.com/chat/completions"}
+MODEL=${ATM_OPENAI_API_MODEL:-"deepseek-chat"}
+TOKEN=${ATM_OPENAI_API_TOKEN:-""}
 
 # Language parameter handling
 LANG="${DEFAULT_LANG:-en}"  # Default to English or use value from .atmrc
@@ -20,7 +20,7 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# Select prompt based on language
+# 选择提示语言
 if [ "$LANG" = "zh" ]; then
     PROMPT="请深呼吸,并按步骤处理这个问题。将提供的diff总结为清晰简洁的commit message。请遵循以下规则:
 
@@ -49,6 +49,9 @@ if [ "$LANG" = "zh" ]; then
 - 创建用户认证中间件
 
 只需提供commit message,无需任何额外解释或格式化。"
+    NOT_GIT_REPO_MSG="错误：当前目录不是Git仓库或Git命令不可用"
+    NO_CHANGES_MSG="暂存区没有更改，检查工作区的更改..."
+    NO_CHANGES_AT_ALL_MSG="工作区也没有更改,请先执行git add"
 else
     PROMPT="Take a deep breath and work on this problem step-by-step. Summarize the provided diff into a clear and concise written commit message. Follow these rules:
 
@@ -77,39 +80,63 @@ Example format:
 - Create user authentication middleware
 
 Provide only the commit message, without any additional explanations or formatting."
+    NOT_GIT_REPO_MSG="Error: Not a Git repository or Git command not available"
+    NO_CHANGES_MSG="No changes in staging area, checking working directory..."
+    NO_CHANGES_AT_ALL_MSG="No changes in working directory either, please run git add first"
 fi
 
-# Continue with the rest of your script...
-# 获取git diff
-DIFF=$(git diff --cached)
+
+# 检查是否在Git仓库中运行
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+    echo "$NOT_GIT_REPO_MSG"
+    exit 1
+fi
+
+# 安全地获取git diff
+get_diff_safely() {
+    local diff_cmd="$1"
+    local diff_output
+    
+    diff_output=$(eval "$diff_cmd" 2>&1)
+    if [[ $? -ne 0 ]]; then
+        if [[ "$diff_output" == *"unknown option"* ]] || [[ "$diff_output" == *"usage:"* ]]; then
+            echo "Error executing: $diff_cmd"
+            echo "Got error: $diff_output"
+            return 1
+        fi
+    fi
+    
+    echo "$diff_output"
+    return 0
+}
+
+# 获取git diff，增加错误处理
+DIFF=$(get_diff_safely "git diff --cached")
 USE_STAGED=true
 
-if [ -z "$DIFF" ]; then
-  if [ "$LANG" = "zh" ]; then
-    echo "暂存区没有更改，检查工作区的更改..."
-  else
-    echo "No changes in staging area, checking working directory..."
-  fi
-  
-  # 检查是否存在首次提交
-  if git rev-parse --verify HEAD >/dev/null 2>&1; then
-    DIFF=$(git diff HEAD)
-  else
-    # 如果是首次提交，获取所有未追踪和修改的文件的差异
-    DIFF=$(git diff)
-  fi
-  
-  USE_STAGED=false
-  if [ -z "$DIFF" ]; then
-    if [ "$LANG" = "zh" ]; then
-      echo "工作区也没有更改,请先执行git add"
+if [ $? -ne 0 ] || [ -z "$DIFF" ]; then
+    echo "$NO_CHANGES_MSG"
+    
+    # 检查是否存在首次提交
+    if git rev-parse --verify HEAD &>/dev/null; then
+        DIFF=$(get_diff_safely "git diff HEAD")
+        if [ $? -ne 0 ]; then
+            # 尝试简单的diff命令作为后备
+            DIFF=$(get_diff_safely "git diff")
+        fi
     else
-      echo "No changes in working directory either, please run git add first"
+        # 首次提交，获取所有未追踪和修改的文件的差异
+        DIFF=$(get_diff_safely "git diff")
     fi
-    exit 1
-  fi
+    
+    USE_STAGED=false
+    if [ $? -ne 0 ] || [ -z "$DIFF" ]; then
+        echo "$NO_CHANGES_AT_ALL_MSG"
+        exit 1
+    fi
 fi
 
+# 以下是脚本的剩余部分...
 # 准备请求数据
 REQUEST_DATA=$(jq -n \
                   --arg model "$MODEL" \

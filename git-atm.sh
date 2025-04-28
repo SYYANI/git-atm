@@ -8,8 +8,49 @@ BASE_URL=${ATM_OPENAI_API_BASE_URL:-"https://api.openai.com/v1/completions"}
 MODEL=${ATM_OPENAI_API_MODEL:-"gpt-4"}
 TOKEN=${ATM_OPENAI_API_TOKEN:-"your-api-token-here"}
 
-# Updated prompt to generate [type]: [description] format
-PROMPT="Take a deep breath and work on this problem step-by-step. Summarize the provided diff into a clear and concise written commit message. Follow these rules:
+# Language parameter handling
+LANG="${DEFAULT_LANG:-en}"  # Default to English or use value from .atmrc
+
+# Parse command line arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -l|--lang) LANG="$2"; shift ;;
+        *) echo "Unknown parameter: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+# Select prompt based on language
+if [ "$LANG" = "zh" ]; then
+    PROMPT="请深呼吸,并按步骤处理这个问题。将提供的diff总结为清晰简洁的commit message。请遵循以下规则:
+
+1. 使用'[类型]: 描述'的格式,其中类型为以下之一:
+ - feat (新功能)
+ - fix (修复bug)
+ - docs (文档)
+ - style (格式化、补充分号等)
+ - refactor (重构代码)
+ - perf (性能优化)
+ - test (添加测试)
+ - chore (维护任务)
+
+2. 描述部分使用祈使句式
+3. 主题行限制在50个字符内
+4. 如有需要,空一行后用要点符号列出额外细节
+5. 在保持简洁的同时尽可能描述详细
+6. 返回可直接粘贴到commit编辑中的commit message,无需进一步编辑
+7. 始终使用中文回复
+
+示例格式:
+[feat]: 添加用户认证系统
+
+- 实现JWT令牌生成
+- 添加登录/登出接口
+- 创建用户认证中间件
+
+只需提供commit message,无需任何额外解释或格式化。"
+else
+    PROMPT="Take a deep breath and work on this problem step-by-step. Summarize the provided diff into a clear and concise written commit message. Follow these rules:
 
 1. Use the format '[type]: description' where type is one of:
    - feat (new feature)
@@ -36,40 +77,19 @@ Example format:
 - Create user authentication middleware
 
 Provide only the commit message, without any additional explanations or formatting."
+fi
 
-# PROMPT="请深呼吸,并按步骤处理这个问题。将提供的diff总结为清晰简洁的commit message。请遵循以下规则:
-
-# 1. 使用'[类型]: 描述'的格式,其中类型为以下之一:
-#  - feat (新功能)
-#  - fix (修复bug)
-#  - docs (文档)
-#  - style (格式化、补充分号等)
-#  - refactor (重构代码)
-#  - perf (性能优化)
-#  - test (添加测试)
-#  - chore (维护任务)
-
-# 2. 描述部分使用祈使句式
-# 3. 主题行限制在50个字符内
-# 4. 如有需要,空一行后用要点符号列出额外细节
-# 5. 在保持简洁的同时尽可能描述详细
-# 6. 返回可直接粘贴到commit编辑中的commit message,无需进一步编辑
-# 7. 始终使用中文回复
-
-# 示例格式:
-# [feat]: 添加用户认证系统
-# - 实现JWT令牌生成
-# - 添加登录/登出接口
-# - 创建用户认证中间件
-
-# 只需提供commit message,无需任何额外解释或格式化。"
-
+# Continue with the rest of your script...
 # 获取git diff
 DIFF=$(git diff --cached)
 USE_STAGED=true
 
 if [ -z "$DIFF" ]; then
-  echo "暂存区没有更改，检查工作区的更改..."
+  if [ "$LANG" = "zh" ]; then
+    echo "暂存区没有更改，检查工作区的更改..."
+  else
+    echo "No changes in staging area, checking working directory..."
+  fi
   
   # 检查是否存在首次提交
   if git rev-parse --verify HEAD >/dev/null 2>&1; then
@@ -81,7 +101,11 @@ if [ -z "$DIFF" ]; then
   
   USE_STAGED=false
   if [ -z "$DIFF" ]; then
-    echo "工作区也没有更改,请先执行git add"
+    if [ "$LANG" = "zh" ]; then
+      echo "工作区也没有更改,请先执行git add"
+    else
+      echo "No changes in working directory either, please run git add first"
+    fi
     exit 1
   fi
 fi

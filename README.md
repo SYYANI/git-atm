@@ -1,86 +1,131 @@
-# 🤖 Git-ATM (AI commit Text Generator)
+# 🤖 Git-ATM (AI Commit Message Generator)
 
-Git-ATM 是一个智能的 Git commit 信息生成工具，它使用 OpenAI API(或对齐的api，如DeepSeek API) 来分析你的代码变更，并自动生成清晰、规范的 commit 信息。
+Git-ATM is an intelligent Git commit message generator that uses AI APIs (like OpenAI or DeepSeek) to analyze your code changes and automatically generate clear, standardized commit messages.
 
-## ✨ 特性
+## ✨ Features
 
-- 自动分析 git diff 内容
-- 使用 AI 生成符合最佳实践的 commit 信息
-- 支持 emoji 前缀
-- 支持自定义 OpenAI API 配置
-- 交互式确认机制
-- 支持暂存区和工作区的更改
+- Automatically analyzes git diff content
+- Uses AI to generate commit messages following best practices
+- Supports conventional commit format `[type]: description`
+- Supports custom API configurations
+- Interactive confirmation mechanism
+- Supports changes in both staged and working directories
+- Multi-language support (English, Chinese) with language parameter control
 
-## 🚀 安装
+## 🚀 Installation
 
-1. 克隆仓库：
+1. Clone the repository:
 ```bash
-git clone https://github.com/falconchen/git-atm.git
+git clone https://github.com/SYYANI/git-atm.git
 ```
 
-2. 添加执行权限：
+2. Add execution permissions:
 ```bash
 chmod +x git-atm.sh
 ```
 
-3. 创建配置文件：
+3. Create a configuration file:
 ```bash
 cp .atmrc.example ~/.atmrc
 ```
 
-4. 编辑 `~/.atmrc` 文件，设置你的 OpenAI或DeepSeek API 密钥：
-    - `ATM_OPENAI_API_TOKEN`: OpenAI或DeepSeek API 密钥
-    - `ATM_OPENAI_API_MODEL`: 使用的 AI 模型（默认：gpt-4）
-    - `ATM_OPENAI_API_BASE_URL`: API 基础 URL
+4. Edit the `~/.atmrc` file to set your API key and preferences:
+```bash
+# API Configuration
+TOKEN="your-api-key-here"
+MODEL="gpt-4" # or your preferred model
+BASE_URL="https://api.openai.com/v1/chat/completions" # or another compatible API endpoint
 
+# Default language setting (en for English, zh for Chinese)
+DEFAULT_LANG="en"
+```
 
-5. 创建软链接并加入到 PATH 中，如`/usr/local/bin`，添加后可以通过`git atm`作为git 子命令使用：
+5. Create a symbolic link to add it to your PATH (allowing you to use `git atm` as a git subcommand):
 ```bash
 ln -s $(pwd)/git-atm.sh /usr/local/bin/git-atm
 chmod +x /usr/local/bin/git-atm
 ```
 
-## 💡 使用方法
+## 💡 Usage
 
-1. 在你的 Git 仓库中进行代码更改
-2. 运行 git-atm：
+1. Make code changes in your Git repository
+2. Run git-atm:
 ```bash
+# Generate commit message in English (default)
 git atm
+
+# Generate commit message in Chinese
+git atm --lang zh
+# or
+git atm -l zh
 ```
-3. 查看生成的 commit 信息，并选择：
-   - `yes/y`: 使用生成的信息创建 commit
-   - `no/n`: 取消操作
-   - `regenerate/r`: 重新生成 commit 信息
-   - `custom/c`: 输入自定义 commit 信息
+3. Review the generated commit message and choose:
+   - `yes/y`: Use the generated message to create the commit
+   - `no/n`: Cancel the operation
+   - `regenerate/r`: Generate a new commit message
+   - `custom/c`: Enter a custom commit message
 
+## 📝 Commit Message Format
 
-## 📝 Commit 信息格式
+The generated commit messages follow the conventional commit format:
 
-生成的 commit 信息遵循以下格式：
-- 以表示变更类型的 emoji 开头
-- 使用祈使语气
-- 主题行限制在 50 个字符以内
-- 可选的描述部分与主题之间有空行分隔
+```
+[type]: description
 
-常用的 emoji 类型：
-- ✨ 新功能
-- 🐛 Bug 修复
-- 📚 文档更新
-- 🎨 样式/界面
-- ♻️ 重构
-- 🚀 性能优化
-- 🧪 测试
-- 🔧 配置调整
-- 🔒 安全相关
+- Optional bullet point details
+- Additional information
+```
 
-## 📄 许可证
+Where `type` is one of:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Formatting, missing semicolons, etc.
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Adding tests
+- `chore`: Maintenance tasks
+
+The format follows these rules:
+- Uses imperative mood
+- Subject line limited to 50 characters
+- Optional description with bullet points separated by a blank line
+- Generated in English or Chinese based on your language setting
+
+## 🔧 Configuration
+
+You can customize the behavior of Git-ATM by editing the `~/.atmrc` file:
+
+```bash
+# API Configuration
+TOKEN="your-api-key-here"              # Your OpenAI/DeepSeek API key
+MODEL="gpt-4"                          # AI model to use
+BASE_URL="https://api.openai.com/v1/chat/completions"  # API endpoint
+
+# Language preference
+DEFAULT_LANG="en"                      # Default language (en/zh)
+```
+
+## 🌐 Language Support
+
+Git-ATM supports generating commit messages in:
+- English (default): Use `git atm` or `git atm --lang en`
+- Chinese: Use `git atm --lang zh`
+
+The language setting determines both the user interface messages and the generated commit message language.
+
+## 📄 License
 
 [MIT License](LICENSE)
 
-## 🤝 贡献
+## 🤝 Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Issues and Pull Requests are welcome! Feel free to contribute to this project by:
+- Reporting bugs
+- Suggesting enhancements
+- Adding new features
+- Improving documentation
 
-## 📮 联系方式
+## 📮 Contact
 
-如有问题或建议，请通过 GitHub Issues 联系我。
+For questions or suggestions, please contact me through GitHub Issues.

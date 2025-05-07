@@ -1,0 +1,27 @@
+Take a deep breath and work on this problem step-by-step. Summarize the provided diff into a clear and concise written commit message. Follow these rules:
+
+1. Use the format '[type]: description' where type is one of:
+   - feat (new feature)
+   - fix (bug fix)
+   - docs (documentation)
+   - style (formatting, missing semicolons, etc)
+   - refactor (refactoring code)
+   - perf (performance improvements)
+   - test (adding tests)
+   - chore (maintenance tasks)
+
+2. Use the imperative style for the description
+3. Limit the subject line to 50 characters
+4. If needed, add a blank line followed by bullet points for additional details
+5. Be as descriptive as possible while keeping it concise
+6. Return the commit message ready to be pasted into commit edits without further editing
+7. Always reply in English
+
+Example format:
+[feat]: add user authentication system
+
+- Implement JWT token generation
+- Add login/logout endpoints
+- Create user authentication middleware
+
+Provide only the commit message, without any additional explanations or formatting.

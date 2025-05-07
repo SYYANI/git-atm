@@ -1,131 +1,130 @@
-# 🤖 Git-ATM (AI Commit Message Generator)
+# 🤖 Git-ATM (AI Commit Message Generator) - PowerShell版本
 
-Git-ATM is an intelligent Git commit message generator that uses AI APIs (like OpenAI or DeepSeek) to analyze your code changes and automatically generate clear, standardized commit messages.
+Git-ATM是一个智能的Git commit消息生成工具，它使用AI API（如OpenAI或DeepSeek）分析你的代码变更，并自动生成清晰、规范的commit消息。这是使用PowerShell实现的更可靠版本。
 
-## ✨ Features
+## ✨ 特性
 
-- Automatically analyzes git diff content
-- Uses AI to generate commit messages following best practices
-- Supports conventional commit format `[type]: description`
-- Supports custom API configurations
-- Interactive confirmation mechanism
-- Supports changes in both staged and working directories
-- Multi-language support (English, Chinese) with language parameter control
+- 自动分析git diff内容
+- 使用AI生成符合最佳实践的commit消息
+- 支持常规commit格式 `[type]: description`
+- 支持自定义API配置
+- 交互式确认机制
+- 支持暂存区和工作区的更改
+- 多语言支持（英文、中文）与语言参数控制
+- PowerShell实现，更可靠的字符串和HTTP请求处理
 
-## 🚀 Installation
+## 🚀 安装
 
-1. Clone the repository:
-```bash
-git clone https://github.com/SYYANI/git-atm.git
+1. 克隆仓库：
+```powershell
+git clone https://github.com/yourusername/git-atm.git
+cd git-atm
 ```
 
-2. Add execution permissions:
-```bash
-chmod +x git-atm.sh
+3. 编辑 `.atmrc.ps1` 文件，设置你的API密钥和首选项：
+```powershell
+# Git-ATM 配置文件
+$TOKEN = "your-api-key-here"
+$MODEL = "gpt-4"
+$BASE_URL = "https://api.openai.com/v1/chat/completions"
 ```
 
-3. Create a configuration file:
-```bash
-cp .atmrc.example ~/.atmrc
+## 💡 使用方法
+
+1. 在你的Git仓库中进行代码更改
+2. 运行git-atm：
+```powershell
+# 使用Git-atm命令
+git-atm
+
+# 或直接运行PowerShell脚本
+pwsh -File "C:\完整路径\git-atm.ps1"
+
+# 生成中文commit消息
+git-atm -lang zh
+# 或
+.\git-atm.ps1 -lang zh
 ```
+3. 查看生成的commit消息，并选择：
+   - `yes/y`: 使用生成的消息创建commit
+   - `no/n`: 取消操作
+   - `regenerate/r`: 重新生成commit消息
+   - `custom/c`: 输入自定义commit消息
 
-4. Edit the `~/.atmrc` file to set your API key and preferences:
-```bash
-# API Configuration
-TOKEN="your-api-key-here"
-MODEL="gpt-4" # or your preferred model
-BASE_URL="https://api.openai.com/v1/chat/completions" # or another compatible API endpoint
+## 📝 Commit消息格式
 
-# Default language setting (en for English, zh for Chinese)
-DEFAULT_LANG="en"
-```
-
-5. Create a symbolic link to add it to your PATH (allowing you to use `git atm` as a git subcommand):
-```bash
-ln -s $(pwd)/git-atm.sh /usr/local/bin/git-atm
-chmod +x /usr/local/bin/git-atm
-```
-
-## 💡 Usage
-
-1. Make code changes in your Git repository
-2. Run git-atm:
-```bash
-# Generate commit message in English (default)
-git atm
-
-# Generate commit message in Chinese
-git atm --lang zh
-# or
-git atm -l zh
-```
-3. Review the generated commit message and choose:
-   - `yes/y`: Use the generated message to create the commit
-   - `no/n`: Cancel the operation
-   - `regenerate/r`: Generate a new commit message
-   - `custom/c`: Enter a custom commit message
-
-## 📝 Commit Message Format
-
-The generated commit messages follow the conventional commit format:
+生成的commit消息遵循以下格式：
 
 ```
 [type]: description
 
-- Optional bullet point details
-- Additional information
+- 可选的项目点详情
+- 额外信息
 ```
 
-Where `type` is one of:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Formatting, missing semicolons, etc.
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
-- `test`: Adding tests
-- `chore`: Maintenance tasks
+其中 `type` 是以下之一：
+- `feat`: 新功能
+- `fix`: Bug修复
+- `docs`: 文档更改
+- `style`: 格式化、缺少分号等
+- `refactor`: 代码重构
+- `perf`: 性能改进
+- `test`: 添加测试
+- `chore`: 维护任务
 
-The format follows these rules:
-- Uses imperative mood
-- Subject line limited to 50 characters
-- Optional description with bullet points separated by a blank line
-- Generated in English or Chinese based on your language setting
+格式遵循这些规则：
+- 使用祈使语气
+- 主题行限制在50个字符内
+- 可选的描述与主题之间用空行分隔
+- 根据你的语言设置生成英文或中文
 
-## 🔧 Configuration
+## 🔧 配置
 
-You can customize the behavior of Git-ATM by editing the `~/.atmrc` file:
+你可以通过编辑 `$scriptDir\.atmrc.ps1` 文件来自定义Git-ATM的行为：
 
-```bash
-# API Configuration
-TOKEN="your-api-key-here"              # Your OpenAI/DeepSeek API key
-MODEL="gpt-4"                          # AI model to use
-BASE_URL="https://api.openai.com/v1/chat/completions"  # API endpoint
+```powershell
+# API配置
+$TOKEN = "your-api-key-here"        # 你的OpenAI/DeepSeek API密钥
+$MODEL = "gpt-4"                    # 要使用的AI模型
+$BASE_URL = "https://api.openai.com/v1/chat/completions"  # API端点
 
-# Language preference
-DEFAULT_LANG="en"                      # Default language (en/zh)
+# 可选：设置默认语言 (未使用时默认为英文)
+$DEFAULT_LANG = "en"                # 默认语言(en/zh)
 ```
 
-## 🌐 Language Support
+## 🌐 语言支持
 
-Git-ATM supports generating commit messages in:
-- English (default): Use `git atm` or `git atm --lang en`
-- Chinese: Use `git atm --lang zh`
+Git-ATM支持生成以下语言的commit消息：
+- 英文（默认）：使用 `git atm` 或 `.\git-atm.ps1`
+- 中文：使用 `git atm -lang zh` 或 `.\git-atm.ps1 -lang zh`
 
-The language setting determines both the user interface messages and the generated commit message language.
+语言设置决定了用户界面消息和生成的commit消息的语言。
 
-## 📄 License
+## 🔍 PowerShell相关说明
+
+- 此版本使用PowerShell脚本实现，更可靠地处理复杂字符串和HTTP请求
+- 使用内置的JSON处理功能
+- 更简洁的错误处理和用户交互
+- 配置文件使用PowerShell语法
+- 如遇执行策略问题，可能需要调整执行策略或使用`-ExecutionPolicy Bypass`参数
+
+## 📋 系统要求
+
+- PowerShell 5.1或更高版本（Windows 10/11自带）
+- Git
+
+## 📄 许可证
 
 [MIT License](LICENSE)
 
-## 🤝 Contributing
+## 🤝 贡献
 
-Issues and Pull Requests are welcome! Feel free to contribute to this project by:
-- Reporting bugs
-- Suggesting enhancements
-- Adding new features
-- Improving documentation
+欢迎Issues和Pull Requests！欢迎通过以下方式为这个项目做出贡献：
+- 报告bug
+- 提出改进建议
+- 添加新功能
+- 改进文档
 
-## 📮 Contact
+## 📮 联系
 
-For questions or suggestions, please contact me through GitHub Issues.
+如有问题或建议，请通过GitHub Issues联系我。

@@ -1,4 +1,0 @@
-# deepseek设置
-ATM_OPENAI_API_BASE_URL="https://api.deepseek.com/chat/completions"
-ATM_OPENAI_API_MODEL="deepseek-chat"
-ATM_OPENAI_API_TOKEN="your-api-token"

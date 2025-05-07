@@ -29,6 +29,8 @@ $MODEL = "gpt-4"
 $BASE_URL = "https://api.openai.com/v1/chat/completions"
 ```
 
+4. 将git-atm文件夹添加到PATH环境变量
+
 ## 💡 使用方法
 
 1. 在你的Git仓库中进行代码更改
